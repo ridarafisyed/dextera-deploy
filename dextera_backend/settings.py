@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+import django_heroku
+
 from datetime import timedelta
 from pathlib import Path
 
@@ -26,9 +28,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'django-insecure-hob!)&!2u1vl_rbpmudvj+p=fr5a2ozm@1i*ov0d^u1u(!kwqs'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -57,6 +59,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     # 'social_django.middleware.SocialAuthExceptionMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 
     "corsheaders.middleware.CorsMiddleware",
 
@@ -75,7 +78,7 @@ ROOT_URLCONF = 'dextera_backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'build')], # /home/supersis03/Projects/dextera-project/frontend/build
+        'DIRS': [os.path.join(BASE_DIR, 'frontend/build')], # /home/supersis03/Projects/dextera-project/frontend/build
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -94,15 +97,7 @@ WSGI_APPLICATION = 'dextera_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dextera',
-        'USER': 'postgres',
-        'PASSWORD': 'password1234',
-        'HOST': 'localhost'
-    },
-    
+DATABASES = {    
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -153,11 +148,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' 
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'build/static')
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+django_heroku.settings(locals())
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -226,4 +228,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.UserAccount'
 
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ORIGIN_ALLOW_ALL = True
